@@ -96,14 +96,14 @@ class Parser:
 		n1 = int(ns[0])
 		n2 = int(ns[1])
 		if op == '-':
-			n2 * -1
+			n2 *= -1
 		result = n1 + n2
 		return result
 
 
 
 if __name__ == '__main__':
-	ps = Parser('+ 0 5')
+	ps = Parser('- 0 5')
 	r = ps.parse()
 	i = ps.eat_codes(r)
 	print(i)
