@@ -103,3 +103,8 @@ func (o *Object) String() string {
 func (o *Object) GetKind() ObjectKind {
 	return o.kind
 }
+
+func (o *Object) Clone() *Object {
+	newObj := Object{kind: o.kind, data: o.data}
+	return &newObj
+}
