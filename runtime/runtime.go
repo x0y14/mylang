@@ -52,6 +52,32 @@ func (r *Runtime) doMove(dest, src *Object) error {
 	return nil
 }
 
+func (r *Runtime) doAdd(dest, src *Object) error {
+	if dest.kind != OBJ_REFERENCE {
+		return fmt.Errorf("unsupported add value: reason=dest is not REFERENCE: dest=%v", dest)
+	}
+	switch src.kind {
+	case OBJ_REFERENCE:
+		r.register[RegisterKind(dest.data)].data += r.register[RegisterKind(src.data)].data
+	default:
+		r.register[RegisterKind(dest.data)].data += src.data
+	}
+	return nil
+}
+
+func (r *Runtime) doSub(dest, src *Object) error {
+	if dest.kind != OBJ_REFERENCE {
+		return fmt.Errorf("unsupported sub value: reason=dest is not REFERENCE: dest=%v", dest)
+	}
+	switch src.kind {
+	case OBJ_REFERENCE:
+		r.register[RegisterKind(dest.data)].data -= r.register[RegisterKind(src.data)].data
+	default:
+		r.register[RegisterKind(dest.data)].data -= src.data
+	}
+	return nil
+}
+
 func (r *Runtime) Run(program []*Operation) error {
 	r.setProgram(program)
 	r.setPC(0)
@@ -63,6 +89,16 @@ programLoop:
 			break programLoop
 		case curtOp.kind == OP_MOVE: // MOVE DEST SRC
 			if err := r.doMove(curtOp.param1, curtOp.param2); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_ADD:
+			if err := r.doAdd(curtOp.param1, curtOp.param2); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_SUB:
+			if err := r.doSub(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}

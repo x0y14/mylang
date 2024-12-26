@@ -6,12 +6,16 @@ const (
 	OP_ILLEGAL OperationKind = iota
 	OP_EXIT
 	OP_MOVE
+	OP_ADD
+	OP_SUB
 )
 
 var opKinds = [...]string{
 	OP_ILLEGAL: "ILLEGAL",
 	OP_EXIT:    "EXIT",
 	OP_MOVE:    "MOVE",
+	OP_ADD:     "ADD",
+	OP_SUB:     "SUB",
 }
 
 func (opKind OperationKind) String() string {
