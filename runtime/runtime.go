@@ -226,7 +226,10 @@ func (r *Runtime) Load(program Program) error {
 func (r *Runtime) CollectLabel() error {
 	for pc, op := range r.program {
 		if op.kind == OP_DEF_LABEL {
-			if err := r.memory.Set("l_"+strconv.Itoa(op.param1.data), NewObject(pc)); err != nil {
+			if op.param1.kind != OBJ_LABEL {
+				return fmt.Errorf("failed to collect label: failed to define label: reason=this is not label object: obj=%s", op.param1.String())
+			}
+			if err := r.memory.Set("l_"+strconv.Itoa(op.param1.data), NewReferenceObject(pc)); err != nil {
 				return err
 			}
 		}
@@ -246,49 +249,49 @@ programLoop:
 		switch curtOp := r.consumeOp(); {
 		case curtOp.kind == OP_EXIT: // EXIT
 			break programLoop
-		case curtOp.kind == OP_MOVE: // MOVE DEST SRC
+		case curtOp.kind == OP_MOVE: // MOVE $DEST $SRC
 			if err := r.doMove(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_ADD:
+		case curtOp.kind == OP_ADD: // ADD $DEST $SRC
 			if err := r.doAdd(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_SUB:
+		case curtOp.kind == OP_SUB: // SUB $DEST $SRC
 			if err := r.doSub(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_JUMP:
+		case curtOp.kind == OP_JUMP: // JUMP $LABEL
 			if err := r.doJump(curtOp.param1); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_DEF_LABEL:
+		case curtOp.kind == OP_DEF_LABEL: // DEF_LABEL $LABEL_NO
 			continue
-		case curtOp.kind == OP_EQ:
+		case curtOp.kind == OP_EQ: // EQ $OBJ1 $OBJ2
 			if err := r.doEq(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_NE:
+		case curtOp.kind == OP_NE: // NE $OBJ1 $OBJ2
 			if err := r.doNe(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_LT:
+		case curtOp.kind == OP_LT: // LT $OBJ1 $OBJ2
 			if err := r.doLt(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_LE:
+		case curtOp.kind == OP_LE: // LE $OBJ1 $OBJ2
 			if err := r.doLe(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
-		case curtOp.kind == OP_JUMP_TRUE:
+		case curtOp.kind == OP_JUMP_TRUE: // JUMP_TRUE $LABEL_NO
 			if err := r.doJumpTrue(curtOp.param1); err != nil {
 				r.setStatus(STAT_ERR)
 				return err

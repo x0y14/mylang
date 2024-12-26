@@ -17,17 +17,19 @@ const (
 	OBJ_LIST
 	OBJ_REGISTER
 	OBJ_LABEL
+	OBJ_REFERENCE
 )
 
 var objectKinds = [...]string{
-	OBJ_INVALID:  "INVALID",
-	OBJ_NULL:     "NULL",
-	OBJ_INT:      "INT",
-	OBJ_CHAR:     "CHAR",
-	OBJ_BOOL:     "BOOL",
-	OBJ_LIST:     "LIST",
-	OBJ_REGISTER: "REGISTER",
-	OBJ_LABEL:    "LABEL",
+	OBJ_INVALID:   "INVALID",
+	OBJ_NULL:      "NULL",
+	OBJ_INT:       "INT",
+	OBJ_CHAR:      "CHAR",
+	OBJ_BOOL:      "BOOL",
+	OBJ_LIST:      "LIST",
+	OBJ_REGISTER:  "REGISTER",
+	OBJ_LABEL:     "LABEL",
+	OBJ_REFERENCE: "REFERENCE",
 }
 
 func (objKind ObjectKind) String() string {
@@ -70,8 +72,12 @@ func NewRegisterObject(reg RegisterKind) *Object {
 	return &Object{kind: OBJ_REGISTER, data: int(reg)}
 }
 
-func NewLabelObject(destPC int) *Object {
-	return &Object{kind: OBJ_LABEL, data: destPC}
+func NewLabelObject(labelNo int) *Object {
+	return &Object{kind: OBJ_LABEL, data: labelNo}
+}
+
+func NewReferenceObject(refAddr int) *Object {
+	return &Object{kind: OBJ_REFERENCE, data: refAddr}
 }
 
 type Object struct {
@@ -101,6 +107,8 @@ func (o *Object) String() string {
 		return fmt.Sprintf("register(%s)", RegisterKind(o.data).String())
 	case OBJ_LABEL:
 		return fmt.Sprintf("label(%d)", o.data)
+	case OBJ_REFERENCE:
+		return fmt.Sprintf("reference(%d)", o.data)
 
 	default:
 		log.Fatalf("unsupported object kind: %s", o.kind)
