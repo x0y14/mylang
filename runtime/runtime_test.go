@@ -13,7 +13,7 @@ func TestRuntime_Run_Exit(t *testing.T) {
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},
 		&Operation{kind: OP_EXIT},
 	})
-	err := runtime.LabelCollect()
+	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
@@ -28,7 +28,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_STATUS), param2: NewObject(1)},
 		&Operation{kind: OP_EXIT},
 	})
-	err := runtime.LabelCollect()
+	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, STAT_ERR, Status(runtime.register[REG_STATUS].data))
@@ -39,7 +39,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_STATUS), param2: NewObject(999)},
 		&Operation{kind: OP_EXIT},
 	})
-	err = runtime.LabelCollect()
+	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, 999, runtime.register[REG_STATUS].data)
@@ -51,7 +51,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_STATUS), param2: NewRegisterObject(REG_GENERAL_1)},
 		&Operation{kind: OP_EXIT},
 	})
-	err = runtime.LabelCollect()
+	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, 888, runtime.register[REG_STATUS].data)
@@ -62,7 +62,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 		&Operation{kind: OP_MOVE, param1: NewObject(1), param2: NewObject(1)},
 		&Operation{kind: OP_EXIT},
 	})
-	err = runtime.LabelCollect()
+	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, STAT_ERR, Status(runtime.register[REG_STATUS].data))
@@ -79,7 +79,7 @@ func TestRuntime_Run_Add(t *testing.T) {
 		&Operation{kind: OP_ADD, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(5)},
 		&Operation{kind: OP_EXIT},
 	})
-	err := runtime.LabelCollect()
+	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
@@ -97,7 +97,7 @@ func TestRuntime_Run_Sub(t *testing.T) {
 		&Operation{kind: OP_SUB, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(5)},                   // g1 = 20
 		&Operation{kind: OP_EXIT},
 	})
-	err := runtime.LabelCollect()
+	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
@@ -116,7 +116,7 @@ func TestRuntime_Run_Jump(t *testing.T) {
 		&Operation{kind: OP_SUB, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(5)},   // [3] g1 -= 5
 		&Operation{kind: OP_EXIT}, // [5] g1 = 25
 	})
-	err := runtime.LabelCollect()
+	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)

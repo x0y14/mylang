@@ -96,7 +96,7 @@ func (r *Runtime) Load(program Program) error {
 	return nil
 }
 
-func (r *Runtime) LabelCollect() error {
+func (r *Runtime) CollectLabel() error {
 	for pc, op := range r.program {
 		if op.kind == OP_DEF_LABEL {
 			if err := r.memory.Set("l_"+strconv.Itoa(op.param1.data), NewObject(pc)); err != nil {
