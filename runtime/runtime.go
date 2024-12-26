@@ -91,6 +91,54 @@ func (r *Runtime) doJump(dest *Object) error {
 	return nil
 }
 
+func (r *Runtime) doEq(dest, obj1, obj2 *Object) error {
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported eq value: reason=dest is not REGISTER: dest=%v", dest)
+	}
+	if obj1.data == obj2.data {
+		r.register[RegisterKind(dest.data)] = NewObject(true)
+	} else {
+		r.register[RegisterKind(dest.data)] = NewObject(false)
+	}
+	return nil
+}
+
+func (r *Runtime) doNe(dest, obj1, obj2 *Object) error {
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported ne value: reason=dest is not REGISTER: dest=%v", dest)
+	}
+	if obj1.data != obj2.data {
+		r.register[RegisterKind(dest.data)] = NewObject(true)
+	} else {
+		r.register[RegisterKind(dest.data)] = NewObject(false)
+	}
+	return nil
+}
+
+func (r *Runtime) doLt(dest, obj1, obj2 *Object) error {
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported lt value: reason=dest is not REGISTER: dest=%v", dest)
+	}
+	if obj1.data < obj2.data {
+		r.register[RegisterKind(dest.data)] = NewObject(true)
+	} else {
+		r.register[RegisterKind(dest.data)] = NewObject(false)
+	}
+	return nil
+}
+
+func (r *Runtime) doLe(dest, obj1, obj2 *Object) error {
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported le value: reason=dest is not REGISTER: dest=%v", dest)
+	}
+	if obj1.data <= obj2.data {
+		r.register[RegisterKind(dest.data)] = NewObject(true)
+	} else {
+		r.register[RegisterKind(dest.data)] = NewObject(false)
+	}
+	return nil
+}
+
 func (r *Runtime) Load(program Program) error {
 	r.setProgram(program)
 	return nil
@@ -141,6 +189,26 @@ programLoop:
 			}
 		case curtOp.kind == OP_DEF_LABEL:
 			continue
+		case curtOp.kind == OP_EQ:
+			if err := r.doEq(curtOp.param1, curtOp.param2, curtOp.param3); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_NE:
+			if err := r.doNe(curtOp.param1, curtOp.param2, curtOp.param3); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_LT:
+			if err := r.doLt(curtOp.param1, curtOp.param2, curtOp.param3); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_LE:
+			if err := r.doLe(curtOp.param1, curtOp.param2, curtOp.param3); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
 		default:
 			r.setStatus(STAT_ERR)
 			return fmt.Errorf("unsupported Op: %s", curtOp.kind.String())

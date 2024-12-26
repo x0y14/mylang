@@ -10,6 +10,10 @@ const (
 	OP_SUB
 	OP_JUMP
 	OP_DEF_LABEL
+	OP_EQ
+	OP_NE
+	OP_LT
+	OP_LE
 )
 
 var opKinds = [...]string{
@@ -20,6 +24,10 @@ var opKinds = [...]string{
 	OP_SUB:       "SUB",
 	OP_JUMP:      "JUMP",
 	OP_DEF_LABEL: "DEF_LABEL",
+	OP_EQ:        "EQ",
+	OP_NE:        "NE",
+	OP_LT:        "LT",
+	OP_LE:        "LE",
 }
 
 func (opKind OperationKind) String() string {
