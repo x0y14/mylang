@@ -126,6 +126,6 @@ func TestMemory_DeleteAt(t *testing.T) {
 	assert.Equal(t, err, nil)
 	assert.Equal(t, len(memory.mapping), 1) // Atでデータだけ消したのでマッピングは消えない
 	assert.Equal(t, len(memory.data), 2)
-	assert.Equal(t, memory.data[0], nil)    // 消えていることを確認
+	assert.True(t, memory.data[0] == nil)   // 消えていることを確認
 	assert.Equal(t, memory.mapping["a"], 0) // マッピングの生存を確認
 }
