@@ -68,6 +68,7 @@ func (m *Memory) Delete(key string) error {
 		return fmt.Errorf("failed to delete value: reason=non registered key: key=%v", key)
 	}
 	m.data[address] = nil
+	delete(m.mapping, key)
 	return nil
 }
 
