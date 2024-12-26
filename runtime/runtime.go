@@ -108,7 +108,11 @@ func (r *Runtime) LabelCollect() error {
 }
 
 func (r *Runtime) Run() error {
-	r.setPC(0)
+	entryPointAddressObj, err := r.memory.Get("l_0")
+	if err != nil {
+		return err
+	}
+	r.setPC(entryPointAddressObj.data)
 	r.setStatus(STAT_SUCCESS)
 programLoop:
 	for {
