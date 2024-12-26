@@ -17,6 +17,11 @@ func NewMemory(size int) *Memory {
 }
 
 func (m *Memory) Set(key string, value *Object) error {
+	// すでに登録されている場合エラー
+	_, ok := m.GetAddress(key)
+	if ok {
+		return fmt.Errorf("failed to set value: reason=trying to register key that exists: key=%s", key)
+	}
 	for address := 0; address < len(m.data); address++ {
 		if m.data[address] == nil {
 			m.data[address] = value

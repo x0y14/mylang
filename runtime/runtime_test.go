@@ -22,7 +22,7 @@ func TestRuntime_Run_Exit(t *testing.T) {
 }
 
 func TestRuntime_Run_Move(t *testing.T) {
-	runtime := NewRuntime(3, 4)
+	runtime := NewRuntime(3, 3)
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_STATUS), param2: NewObject(1)},
@@ -34,6 +34,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, STAT_ERR, Status(runtime.register[REG_STATUS].data))
 	assert.Equal(t, nil, err)
 
+	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_STATUS), param2: NewObject(999)},
@@ -45,6 +46,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, 999, runtime.register[REG_STATUS].data)
 	assert.Equal(t, nil, err)
 
+	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(888)},
@@ -57,6 +59,7 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, 888, runtime.register[REG_STATUS].data)
 	assert.Equal(t, nil, err)
 
+	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewObject(1), param2: NewObject(1)},
