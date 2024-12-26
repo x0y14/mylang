@@ -15,19 +15,19 @@ const (
 	OBJ_CHAR
 	OBJ_BOOL
 	OBJ_LIST
-	OBJ_REFERENCE
+	OBJ_REGISTER
 	OBJ_LABEL
 )
 
 var objectKinds = [...]string{
-	OBJ_INVALID:   "INVALID",
-	OBJ_NULL:      "NULL",
-	OBJ_INT:       "INT",
-	OBJ_CHAR:      "CHAR",
-	OBJ_BOOL:      "BOOL",
-	OBJ_LIST:      "LIST",
-	OBJ_REFERENCE: "REFERENCE",
-	OBJ_LABEL:     "LABEL",
+	OBJ_INVALID:  "INVALID",
+	OBJ_NULL:     "NULL",
+	OBJ_INT:      "INT",
+	OBJ_CHAR:     "CHAR",
+	OBJ_BOOL:     "BOOL",
+	OBJ_LIST:     "LIST",
+	OBJ_REGISTER: "REGISTER",
+	OBJ_LABEL:    "LABEL",
 }
 
 func (objKind ObjectKind) String() string {
@@ -66,8 +66,8 @@ func NewListObject(size int) *Object {
 	return &Object{kind: OBJ_LIST, data: size}
 }
 
-func NewReferenceObject(reg RegisterKind) *Object {
-	return &Object{kind: OBJ_REFERENCE, data: int(reg)}
+func NewRegisterObject(reg RegisterKind) *Object {
+	return &Object{kind: OBJ_REGISTER, data: int(reg)}
 }
 
 func NewLabelObject(destPC int) *Object {
@@ -97,8 +97,8 @@ func (o *Object) String() string {
 		}
 	case OBJ_LIST:
 		return fmt.Sprintf("list(%s)", strconv.Itoa(o.data))
-	case OBJ_REFERENCE:
-		return fmt.Sprintf("reference(%s)", RegisterKind(o.data).String())
+	case OBJ_REGISTER:
+		return fmt.Sprintf("register(%s)", RegisterKind(o.data).String())
 	case OBJ_LABEL:
 		return fmt.Sprintf("label(%d)", o.data)
 

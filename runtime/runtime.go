@@ -40,11 +40,11 @@ func (r *Runtime) advance() {
 }
 
 func (r *Runtime) doMove(dest, src *Object) error {
-	if dest.kind != OBJ_REFERENCE {
-		return fmt.Errorf("unsupported move value: reason=dest is not REFERENCE: dest=%v", dest)
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported move value: reason=dest is not REGISTER: dest=%v", dest)
 	}
 	switch src.kind {
-	case OBJ_REFERENCE:
+	case OBJ_REGISTER:
 		r.register[RegisterKind(dest.data)] = r.register[RegisterKind(src.data)].Clone()
 	default:
 		r.register[RegisterKind(dest.data)] = src.Clone()
@@ -53,11 +53,11 @@ func (r *Runtime) doMove(dest, src *Object) error {
 }
 
 func (r *Runtime) doAdd(dest, src *Object) error {
-	if dest.kind != OBJ_REFERENCE {
-		return fmt.Errorf("unsupported add value: reason=dest is not REFERENCE: dest=%v", dest)
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported add value: reason=dest is not REGISTER: dest=%v", dest)
 	}
 	switch src.kind {
-	case OBJ_REFERENCE:
+	case OBJ_REGISTER:
 		r.register[RegisterKind(dest.data)].data += r.register[RegisterKind(src.data)].data
 	default:
 		r.register[RegisterKind(dest.data)].data += src.data
@@ -66,11 +66,11 @@ func (r *Runtime) doAdd(dest, src *Object) error {
 }
 
 func (r *Runtime) doSub(dest, src *Object) error {
-	if dest.kind != OBJ_REFERENCE {
-		return fmt.Errorf("unsupported sub value: reason=dest is not REFERENCE: dest=%v", dest)
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported sub value: reason=dest is not REGISTER: dest=%v", dest)
 	}
 	switch src.kind {
-	case OBJ_REFERENCE:
+	case OBJ_REGISTER:
 		r.register[RegisterKind(dest.data)].data -= r.register[RegisterKind(src.data)].data
 	default:
 		r.register[RegisterKind(dest.data)].data -= src.data
