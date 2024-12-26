@@ -15,15 +15,17 @@ const (
 	OBJ_CHAR
 	OBJ_BOOL
 	OBJ_LIST
+	OBJ_REFERENCE
 )
 
 var objectKinds = [...]string{
-	OBJ_INVALID: "INVALID",
-	OBJ_NULL:    "NULL",
-	OBJ_INT:     "INT",
-	OBJ_CHAR:    "CHAR",
-	OBJ_BOOL:    "BOOL",
-	OBJ_LIST:    "LIST",
+	OBJ_INVALID:   "INVALID",
+	OBJ_NULL:      "NULL",
+	OBJ_INT:       "INT",
+	OBJ_CHAR:      "CHAR",
+	OBJ_BOOL:      "BOOL",
+	OBJ_LIST:      "LIST",
+	OBJ_REFERENCE: "REFERENCE",
 }
 
 func (objKind ObjectKind) String() string {
@@ -62,6 +64,10 @@ func NewListObject(size int) *Object {
 	return &Object{kind: OBJ_LIST, data: size}
 }
 
+func NewReferenceObject(reg RegisterKind) *Object {
+	return &Object{kind: OBJ_REFERENCE, data: int(reg)}
+}
+
 type Object struct {
 	kind ObjectKind
 	data int
@@ -85,6 +91,8 @@ func (o *Object) String() string {
 		}
 	case OBJ_LIST:
 		return fmt.Sprintf("list(%s)", strconv.Itoa(o.data))
+	case OBJ_REFERENCE:
+		return fmt.Sprintf("reference(%s)", RegisterKind(o.data).String())
 
 	default:
 		log.Fatalf("unsupported object kind: %s", o.kind)
