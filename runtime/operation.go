@@ -30,4 +30,19 @@ type Operation struct {
 	param4 *Object
 }
 
-type Program []*Operation
+func (op *Operation) String() string {
+	str := op.kind.String()
+	if op.param1 != nil {
+		str += " " + op.param1.String()
+	}
+	if op.param2 != nil {
+		str += " " + op.param2.String()
+	}
+	if op.param3 != nil {
+		str += " " + op.param3.String()
+	}
+	if op.param4 != nil {
+		str += " " + op.param4.String()
+	}
+	return str
+}
