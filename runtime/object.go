@@ -116,3 +116,7 @@ func (o *Object) Clone() *Object {
 	newObj := Object{kind: o.kind, data: o.data}
 	return &newObj
 }
+
+func (o *Object) IsSame(obj *Object) bool {
+	return o.kind == obj.kind && o.data == obj.data
+}

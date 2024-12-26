@@ -91,15 +91,52 @@ func (r *Runtime) doJump(dest *Object) error {
 	return nil
 }
 
+func (r *Runtime) doJumpTrue(dest *Object) error {
+	if dest.kind != OBJ_LABEL {
+		return fmt.Errorf("unsupported jump_true value: reason=dest is not label: dest=%v", dest)
+	}
+	if r.register[REG_BOOL_FLAG].IsSame(NewObject(false)) {
+		return nil
+	} else if r.register[REG_BOOL_FLAG].IsSame(NewObject(true)) {
+		destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+		if err != nil {
+			return err
+		}
+		r.setPC(destAddressObj.data)
+	} else {
+		return fmt.Errorf("unsupported jump_true value: reason=bool_flag has not bool: %v", r.register[REG_BOOL_FLAG].String())
+	}
+
+	return nil
+}
+
 func (r *Runtime) doEq(dest, obj1, obj2 *Object) error {
 	if dest.kind != OBJ_REGISTER {
 		return fmt.Errorf("unsupported eq value: reason=dest is not REGISTER: dest=%v", dest)
 	}
-	if obj1.data == obj2.data {
-		r.register[RegisterKind(dest.data)] = NewObject(true)
-	} else {
-		r.register[RegisterKind(dest.data)] = NewObject(false)
+	switch {
+	case obj1.kind == OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data == r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind == OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data == obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if obj1.data == r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if obj1.data == obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
 	}
+	r.register[RegisterKind(dest.data)] = NewObject(false)
 	return nil
 }
 
@@ -107,11 +144,29 @@ func (r *Runtime) doNe(dest, obj1, obj2 *Object) error {
 	if dest.kind != OBJ_REGISTER {
 		return fmt.Errorf("unsupported ne value: reason=dest is not REGISTER: dest=%v", dest)
 	}
-	if obj1.data != obj2.data {
-		r.register[RegisterKind(dest.data)] = NewObject(true)
-	} else {
-		r.register[RegisterKind(dest.data)] = NewObject(false)
+	switch {
+	case obj1.kind == OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data != r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind == OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data != obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if obj1.data != r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if obj1.data != obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
 	}
+	r.register[RegisterKind(dest.data)] = NewObject(false)
 	return nil
 }
 
@@ -119,11 +174,29 @@ func (r *Runtime) doLt(dest, obj1, obj2 *Object) error {
 	if dest.kind != OBJ_REGISTER {
 		return fmt.Errorf("unsupported lt value: reason=dest is not REGISTER: dest=%v", dest)
 	}
-	if obj1.data < obj2.data {
-		r.register[RegisterKind(dest.data)] = NewObject(true)
-	} else {
-		r.register[RegisterKind(dest.data)] = NewObject(false)
+	switch {
+	case obj1.kind == OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data < r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind == OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data < obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if obj1.data < r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if obj1.data < obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
 	}
+	r.register[RegisterKind(dest.data)] = NewObject(false)
 	return nil
 }
 
@@ -131,11 +204,29 @@ func (r *Runtime) doLe(dest, obj1, obj2 *Object) error {
 	if dest.kind != OBJ_REGISTER {
 		return fmt.Errorf("unsupported le value: reason=dest is not REGISTER: dest=%v", dest)
 	}
-	if obj1.data <= obj2.data {
-		r.register[RegisterKind(dest.data)] = NewObject(true)
-	} else {
-		r.register[RegisterKind(dest.data)] = NewObject(false)
+	switch {
+	case obj1.kind == OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data <= r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind == OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if r.register[RegisterKind(obj1.data)].data <= obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
+		if obj1.data <= r.register[RegisterKind(obj2.data)].data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
+	case obj1.kind != OBJ_REGISTER && obj2.kind != OBJ_REGISTER:
+		if obj1.data <= obj2.data {
+			r.register[RegisterKind(dest.data)] = NewObject(true)
+			return nil
+		}
 	}
+	r.register[RegisterKind(dest.data)] = NewObject(false)
 	return nil
 }
 
@@ -206,6 +297,11 @@ programLoop:
 			}
 		case curtOp.kind == OP_LE:
 			if err := r.doLe(curtOp.param1, curtOp.param2, curtOp.param3); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_JUMP_TRUE:
+			if err := r.doJumpTrue(curtOp.param1); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}

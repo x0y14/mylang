@@ -9,6 +9,7 @@ const (
 	OP_ADD
 	OP_SUB
 	OP_JUMP
+	OP_JUMP_TRUE
 	OP_DEF_LABEL
 	OP_EQ
 	OP_NE
@@ -23,6 +24,7 @@ var opKinds = [...]string{
 	OP_ADD:       "ADD",
 	OP_SUB:       "SUB",
 	OP_JUMP:      "JUMP",
+	OP_JUMP_TRUE: "JUMP_TRUE",
 	OP_DEF_LABEL: "DEF_LABEL",
 	OP_EQ:        "EQ",
 	OP_NE:        "NE",
