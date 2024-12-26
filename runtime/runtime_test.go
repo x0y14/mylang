@@ -130,139 +130,139 @@ func TestRuntime_Run_Eq(t *testing.T) {
 	runtime := NewRuntime(1, 1)
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(100), param3: NewObject(100)},
+		&Operation{kind: OP_EQ, param1: NewObject(100), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(true), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 
 	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(99), param3: NewObject(100)},
+		&Operation{kind: OP_EQ, param1: NewObject(99), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(false), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 }
 
 func TestRuntime_Run_Ne(t *testing.T) {
 	runtime := NewRuntime(1, 1)
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_NE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(100), param3: NewObject(100)},
+		&Operation{kind: OP_NE, param1: NewObject(100), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(false), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
 	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_NE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(99), param3: NewObject(100)},
+		&Operation{kind: OP_NE, param1: NewObject(99), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(true), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 }
 
 func TestRuntime_Run_Lt(t *testing.T) {
 	runtime := NewRuntime(1, 1)
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(100), param3: NewObject(100)},
+		&Operation{kind: OP_LT, param1: NewObject(100), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(false), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
 	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(100), param3: NewObject(99)},
+		&Operation{kind: OP_LT, param1: NewObject(100), param2: NewObject(99)},
 		&Operation{kind: OP_EXIT},
 	})
 	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(false), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
 	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(99), param3: NewObject(100)},
+		&Operation{kind: OP_LT, param1: NewObject(99), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(true), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 }
 
 func TestRuntime_Run_Le(t *testing.T) {
 	runtime := NewRuntime(1, 1)
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_LE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(100), param3: NewObject(100)},
+		&Operation{kind: OP_LE, param1: NewObject(100), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err := runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(true), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 
 	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_LE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(100), param3: NewObject(99)},
+		&Operation{kind: OP_LE, param1: NewObject(100), param2: NewObject(99)},
 		&Operation{kind: OP_EXIT},
 	})
 	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(false), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
 	_ = runtime.memory.Delete("l_0")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)}, // main:
-		&Operation{kind: OP_LE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(99), param3: NewObject(100)},
+		&Operation{kind: OP_LE, param1: NewObject(99), param2: NewObject(100)},
 		&Operation{kind: OP_EXIT},
 	})
 	err = runtime.CollectLabel()
 	assert.Equal(t, nil, err)
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, NewObject(true), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 }
 
 func TestRuntime_Run_JumpTrue(t *testing.T) {
 	runtime := NewRuntime(1, 3)
 	_ = runtime.Load(Program{
-		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},                                                                              // main:
-		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},                                         // 	g1 = 0
-		&Operation{kind: OP_DEF_LABEL, param1: NewObject(1)},                                                                              // loop:
-		&Operation{kind: OP_ADD, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(1)},                                          //		g1 += 1
-		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_BOOL_FLAG), param2: NewRegisterObject(REG_GENERAL_1), param3: NewObject(5)}, // 	if (g1 < 5) bool_flag = true
-		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(1)},                                                                         //	jt loop
+		&Operation{kind: OP_DEF_LABEL, param1: NewObject(0)},                                      // main:
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)}, // 	g1 = 0
+		&Operation{kind: OP_DEF_LABEL, param1: NewObject(1)},                                      // loop:
+		&Operation{kind: OP_ADD, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(1)},  //		g1 += 1
+		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(5)},   // 	if (g1 < 5) bool_flag = true
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(1)},                                 //	jt loop
 		&Operation{kind: OP_EXIT},
 	})
 	err := runtime.CollectLabel()
