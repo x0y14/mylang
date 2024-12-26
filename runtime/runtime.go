@@ -45,9 +45,9 @@ func (r *Runtime) doMove(dest, src *Object) error {
 	}
 	switch src.kind {
 	case OBJ_REFERENCE:
-		r.register[RegisterKind(dest.data)] = r.register[RegisterKind(src.data)]
+		r.register[RegisterKind(dest.data)] = r.register[RegisterKind(src.data)].Clone()
 	default:
-		r.register[RegisterKind(dest.data)] = src
+		r.register[RegisterKind(dest.data)] = src.Clone()
 	}
 	return nil
 }
