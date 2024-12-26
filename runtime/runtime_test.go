@@ -9,9 +9,10 @@ import (
 func TestRuntime_Run_Exit(t *testing.T) {
 	runtime := NewRuntime(3, 3)
 	assert.True(t, nil == runtime.register[REG_PROGRAM_COUNTER])
-	runtime.Run(Program{
+	err := runtime.Run(Program{
 		&Operation{kind: OP_EXIT},
 	})
+	assert.Equal(t, nil, err)
 	assert.Equal(t, 1, runtime.register[REG_PROGRAM_COUNTER].data)
 	assert.Equal(t, STAT_SUCCESS, Status(runtime.register[REG_STATUS].data))
 }
