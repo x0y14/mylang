@@ -9,15 +9,17 @@ const (
 	OP_ADD
 	OP_SUB
 	OP_JUMP
+	OP_DEF_LABEL
 )
 
 var opKinds = [...]string{
-	OP_ILLEGAL: "ILLEGAL",
-	OP_EXIT:    "EXIT",
-	OP_MOVE:    "MOVE",
-	OP_ADD:     "ADD",
-	OP_SUB:     "SUB",
-	OP_JUMP:    "JUMP",
+	OP_ILLEGAL:   "ILLEGAL",
+	OP_EXIT:      "EXIT",
+	OP_MOVE:      "MOVE",
+	OP_ADD:       "ADD",
+	OP_SUB:       "SUB",
+	OP_JUMP:      "JUMP",
+	OP_DEF_LABEL: "DEF_LABEL",
 }
 
 func (opKind OperationKind) String() string {

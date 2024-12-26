@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Runtime struct {
@@ -20,7 +21,7 @@ func NewRuntime(stackSize int, memorySize int) *Runtime {
 	}
 }
 
-func (r *Runtime) setProgram(prog []*Operation) {
+func (r *Runtime) setProgram(prog Program) {
 	r.program = prog
 }
 func (r *Runtime) setPC(newPC int) {
@@ -82,12 +83,31 @@ func (r *Runtime) doJump(dest *Object) error {
 	if dest.kind != OBJ_LABEL {
 		return fmt.Errorf("unsupported jump value: reason=dest is not label: dest=%v", dest)
 	}
-	r.setPC(dest.data)
+	destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+	if err != nil {
+		return err
+	}
+	r.setPC(destAddressObj.data)
 	return nil
 }
 
-func (r *Runtime) Run(program []*Operation) error {
+func (r *Runtime) Load(program Program) error {
 	r.setProgram(program)
+	return nil
+}
+
+func (r *Runtime) LabelCollect() error {
+	for pc, op := range r.program {
+		if op.kind == OP_DEF_LABEL {
+			if err := r.memory.Set("l_"+strconv.Itoa(op.param1.data), NewObject(pc)); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *Runtime) Run() error {
 	r.setPC(0)
 	r.setStatus(STAT_SUCCESS)
 programLoop:
@@ -115,6 +135,8 @@ programLoop:
 				r.setStatus(STAT_ERR)
 				return err
 			}
+		case curtOp.kind == OP_DEF_LABEL:
+			continue
 		default:
 			r.setStatus(STAT_ERR)
 			return fmt.Errorf("unsupported Op: %s", curtOp.kind.String())
