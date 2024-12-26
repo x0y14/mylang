@@ -78,6 +78,14 @@ func (r *Runtime) doSub(dest, src *Object) error {
 	return nil
 }
 
+func (r *Runtime) doJump(dest *Object) error {
+	if dest.kind != OBJ_LABEL {
+		return fmt.Errorf("unsupported jump value: reason=dest is not label: dest=%v", dest)
+	}
+	r.setPC(dest.data)
+	return nil
+}
+
 func (r *Runtime) Run(program []*Operation) error {
 	r.setProgram(program)
 	r.setPC(0)
@@ -99,6 +107,11 @@ programLoop:
 			}
 		case curtOp.kind == OP_SUB:
 			if err := r.doSub(curtOp.param1, curtOp.param2); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_JUMP:
+			if err := r.doJump(curtOp.param1); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}

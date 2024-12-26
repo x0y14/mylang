@@ -76,3 +76,16 @@ func TestRuntime_Run_Sub(t *testing.T) {
 	assert.Equal(t, NewObject(25), runtime.register[REG_STATUS])
 	assert.Equal(t, NewObject(20), runtime.register[REG_GENERAL_1])
 }
+
+func TestRuntime_Run_Jump(t *testing.T) {
+	runtime := NewRuntime(3, 3)
+	err := runtime.Run(Program{
+		&Operation{kind: OP_MOVE, param1: NewReferenceObject(REG_GENERAL_1), param2: NewObject(30)}, // [0] g1 = 30
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(3)},                                        // [1]
+		&Operation{kind: OP_ADD, param1: NewReferenceObject(REG_GENERAL_1), param2: NewObject(30)},  // [2] g1 += 30
+		&Operation{kind: OP_SUB, param1: NewReferenceObject(REG_GENERAL_1), param2: NewObject(5)},   // [3] g1 -= 5
+		&Operation{kind: OP_EXIT}, // [5] g1 = 25
+	})
+	assert.Equal(t, nil, err)
+	assert.Equal(t, NewObject(25), runtime.register[REG_GENERAL_1])
+}
