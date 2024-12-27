@@ -408,6 +408,9 @@ func TestRuntime_Run_SyscallWrite(t *testing.T) {
 		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('l')},
 		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('d')},
 		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('!')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject(true)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject(30)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewNullObject()},
 		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('\n')},
 		&Operation{kind: OP_RETURN},
 	})
