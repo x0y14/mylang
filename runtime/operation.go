@@ -19,25 +19,27 @@ const (
 	OP_NE
 	OP_LT
 	OP_LE
+	OP_SYSCALL_WRITE
 )
 
 var opKinds = [...]string{
-	OP_ILLEGAL:   "ILLEGAL",
-	OP_EXIT:      "EXIT",
-	OP_MOVE:      "MOVE",
-	OP_PUSH:      "PUSH",
-	OP_POP:       "POP",
-	OP_CALL:      "CALL",
-	OP_RETURN:    "RETURN",
-	OP_ADD:       "ADD",
-	OP_SUB:       "SUB",
-	OP_JUMP:      "JUMP",
-	OP_JUMP_TRUE: "JUMP_TRUE",
-	OP_DEF_LABEL: "DEF_LABEL",
-	OP_EQ:        "EQ",
-	OP_NE:        "NE",
-	OP_LT:        "LT",
-	OP_LE:        "LE",
+	OP_ILLEGAL:       "ILLEGAL",
+	OP_EXIT:          "EXIT",
+	OP_MOVE:          "MOVE",
+	OP_PUSH:          "PUSH",
+	OP_POP:           "POP",
+	OP_CALL:          "CALL",
+	OP_RETURN:        "RETURN",
+	OP_ADD:           "ADD",
+	OP_SUB:           "SUB",
+	OP_JUMP:          "JUMP",
+	OP_JUMP_TRUE:     "JUMP_TRUE",
+	OP_DEF_LABEL:     "DEF_LABEL",
+	OP_EQ:            "EQ",
+	OP_NE:            "NE",
+	OP_LT:            "LT",
+	OP_LE:            "LE",
+	OP_SYSCALL_WRITE: "SYSCALL_WRITE",
 }
 
 func (opKind OperationKind) String() string {

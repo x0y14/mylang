@@ -128,3 +128,21 @@ func (o *Object) Clone() *Object {
 func (o *Object) IsSame(obj *Object) bool {
 	return o.kind == obj.kind && o.data == obj.data
 }
+
+func (o *Object) StringData() string {
+	switch o.kind {
+	case OBJ_INT:
+		return strconv.Itoa(o.data)
+	case OBJ_CHAR:
+		return string(rune(o.data))
+	case OBJ_BOOL:
+		if o.data == 1 {
+			return "true"
+		}
+		return "false"
+	case OBJ_NULL:
+		return "null"
+	default:
+		return ""
+	}
+}

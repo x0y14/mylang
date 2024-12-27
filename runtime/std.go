@@ -1,7 +1,7 @@
 package runtime
 
 var (
-	Stdin  = 0
-	Stdout = 1
-	Stderr = 2
+	STD_IN  = 1
+	STD_OUT = 2
+	STD_ERR = 3
 )

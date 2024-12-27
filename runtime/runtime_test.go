@@ -391,3 +391,28 @@ func TestRuntime_Run_JumpTrue(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(5), runtime.register[REG_GENERAL_1])
 }
+
+func TestRuntime_Run_SyscallWrite(t *testing.T) {
+	runtime := NewRuntime(1, 2)
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('h')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('e')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('l')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('l')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('o')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject(',')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('w')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('o')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('r')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('l')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('d')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('!')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('\n')},
+		&Operation{kind: OP_RETURN},
+	})
+	err := runtime.CollectLabel()
+	assert.Equal(t, nil, err)
+	err = runtime.Run()
+	assert.Equal(t, nil, err)
+}

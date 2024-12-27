@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -273,6 +274,24 @@ func (r *Runtime) doLe(obj1, obj2 *Object) error {
 	return nil
 }
 
+func (r *Runtime) doSyscallWrite(dest, src *Object) error {
+	var f *os.File
+	switch {
+	case dest.IsSame(NewObject(STD_OUT)):
+		f = os.Stdout
+	case dest.IsSame(NewObject(STD_ERR)):
+		f = os.Stderr
+	default:
+		return fmt.Errorf("unsupported syscall_write value: reason=dest is nor 2 & 3: dest=%v", dest)
+	}
+	if src.kind == OBJ_REGISTER {
+		_, err := fmt.Fprintf(f, r.register[RegisterKind(src.data)].StringData())
+		return err
+	}
+	_, err := fmt.Fprintf(f, src.StringData())
+	return err
+}
+
 func (r *Runtime) Load(program Program) error {
 	// main(l_0)を叩くコード, exit
 	startup := Program{
@@ -375,6 +394,11 @@ programLoop:
 			}
 		case curtOp.kind == OP_JUMP_TRUE: // JUMP_TRUE $LABEL_NO
 			if err := r.doJumpTrue(curtOp.param1); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_SYSCALL_WRITE:
+			if err := r.doSyscallWrite(curtOp.param1, curtOp.param2); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}
