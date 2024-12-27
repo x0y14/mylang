@@ -53,6 +53,32 @@ func (r *Runtime) doMove(dest, src *Object) error {
 	return nil
 }
 
+func (r *Runtime) doPush(obj1 *Object) error {
+	switch {
+	case obj1.kind == OBJ_REGISTER:
+		if err := r.stack.Push(r.register[RegisterKind(obj1.data)].Clone()); err != nil {
+			return err
+		}
+	default:
+		if err := r.stack.Push(obj1.Clone()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *Runtime) doPop(dest *Object) error {
+	if dest.kind != OBJ_REGISTER {
+		return fmt.Errorf("unsupported pop value: reason=dest is not REGISTER: dest=%v", dest)
+	}
+	pop, err := r.stack.Pop()
+	if err != nil {
+		return err
+	}
+	r.register[RegisterKind(dest.data)] = pop.Clone()
+	return nil
+}
+
 func (r *Runtime) doAdd(dest, src *Object) error {
 	if dest.kind != OBJ_REGISTER {
 		return fmt.Errorf("unsupported add value: reason=dest is not REGISTER: dest=%v", dest)
@@ -251,6 +277,16 @@ programLoop:
 			break programLoop
 		case curtOp.kind == OP_MOVE: // MOVE $DEST $SRC
 			if err := r.doMove(curtOp.param1, curtOp.param2); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_PUSH:
+			if err := r.doPush(curtOp.param1); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_POP:
+			if err := r.doPop(curtOp.param1); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}

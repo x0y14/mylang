@@ -6,6 +6,8 @@ const (
 	OP_ILLEGAL OperationKind = iota
 	OP_EXIT
 	OP_MOVE
+	OP_PUSH
+	OP_POP
 	OP_ADD
 	OP_SUB
 	OP_JUMP
@@ -21,6 +23,8 @@ var opKinds = [...]string{
 	OP_ILLEGAL:   "ILLEGAL",
 	OP_EXIT:      "EXIT",
 	OP_MOVE:      "MOVE",
+	OP_PUSH:      "PUSH",
+	OP_POP:       "POP",
 	OP_ADD:       "ADD",
 	OP_SUB:       "SUB",
 	OP_JUMP:      "JUMP",

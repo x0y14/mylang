@@ -72,6 +72,77 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, fmt.Errorf("unsupported move value: reason=dest is not REGISTER: dest=%d", 1), err)
 }
 
+func TestRuntime_Run_Push(t *testing.T) {
+	runtime := NewRuntime(3, 3)
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_PUSH, param1: NewObject(1)},
+		&Operation{kind: OP_PUSH, param1: NewObject(2)},
+		&Operation{kind: OP_PUSH, param1: NewObject(3)},
+		&Operation{kind: OP_EXIT},
+	})
+	err := runtime.CollectLabel()
+	assert.Equal(t, nil, err)
+	err = runtime.Run()
+	assert.Equal(t, nil, err)
+	assert.Equal(t, NewObject(3), runtime.stack.objects[2])
+	assert.Equal(t, NewObject(2), runtime.stack.objects[1])
+	assert.Equal(t, NewObject(1), runtime.stack.objects[0])
+}
+func TestRuntime_Run_Pop(t *testing.T) {
+	runtime := NewRuntime(3, 1)
+	// 単純なpush, pop
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_PUSH, param1: NewObject(1)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_EXIT},
+	})
+	err := runtime.CollectLabel()
+	assert.Nil(t, err)
+	err = runtime.Run()
+	assert.Nil(t, err)
+	assert.Equal(t, NewObject(1), runtime.register[REG_GENERAL_1])
+	// remove main
+	_ = runtime.memory.Delete("l_0")
+	// popで上書き
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_PUSH, param1: NewObject(1)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_PUSH, param1: NewObject(2)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_PUSH, param1: NewObject(3)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_EXIT},
+	})
+	err = runtime.CollectLabel()
+	assert.Nil(t, err)
+	err = runtime.Run()
+	assert.Nil(t, err)
+	assert.Equal(t, NewObject(3), runtime.register[REG_GENERAL_1])
+	// remove main
+	_ = runtime.memory.Delete("l_0")
+	// G2に足してく
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_2), param2: NewObject(0)},                    // g2 = 0
+		&Operation{kind: OP_PUSH, param1: NewObject(1)},                                                              // [1, 0, 0]
+		&Operation{kind: OP_PUSH, param1: NewObject(2)},                                                              // [1, 2, 0]
+		&Operation{kind: OP_PUSH, param1: NewObject(3)},                                                              // [1, 2, 3]
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},                                           // g1 = 3
+		&Operation{kind: OP_ADD, param1: NewRegisterObject(REG_GENERAL_2), param2: NewRegisterObject(REG_GENERAL_1)}, // g2 += g1 (0 += 3)
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},                                           // g1 = 2
+		&Operation{kind: OP_ADD, param1: NewRegisterObject(REG_GENERAL_2), param2: NewRegisterObject(REG_GENERAL_1)}, // g2 += g1 (3 += 2)
+		&Operation{kind: OP_EXIT},
+	})
+	err = runtime.CollectLabel()
+	assert.Nil(t, err)
+	err = runtime.Run()
+	assert.Nil(t, err)
+	assert.Equal(t, NewObject(5), runtime.register[REG_GENERAL_2])
+}
+
 func TestRuntime_Run_Add(t *testing.T) {
 	runtime := NewRuntime(3, 3)
 	_ = runtime.Load(Program{
