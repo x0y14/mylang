@@ -8,6 +8,8 @@ const (
 	OP_MOVE
 	OP_PUSH
 	OP_POP
+	OP_CALL
+	OP_RETURN
 	OP_ADD
 	OP_SUB
 	OP_JUMP
@@ -25,6 +27,8 @@ var opKinds = [...]string{
 	OP_MOVE:      "MOVE",
 	OP_PUSH:      "PUSH",
 	OP_POP:       "POP",
+	OP_CALL:      "CALL",
+	OP_RETURN:    "RETURN",
 	OP_ADD:       "ADD",
 	OP_SUB:       "SUB",
 	OP_JUMP:      "JUMP",

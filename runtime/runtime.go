@@ -79,6 +79,35 @@ func (r *Runtime) doPop(dest *Object) error {
 	return nil
 }
 
+func (r *Runtime) doCall(dest *Object) error {
+	if dest.kind != OBJ_LABEL {
+		return fmt.Errorf("unsupported call value: reason=dest is not LABEL: dest=%v", dest)
+	}
+	if err := r.stack.Push(NewReferenceObject(r.register[REG_PROGRAM_COUNTER].data)); err != nil {
+		return err
+	}
+	// ラベル経由で宛先の取り出し
+	destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+	if err != nil {
+		return err
+	}
+	// PCの書き換え
+	r.setPC(destAddressObj.data)
+	return nil
+}
+func (r *Runtime) doReturn() error {
+	dest, err := r.stack.Pop()
+	if err != nil {
+		return err
+	}
+	if dest.kind != OBJ_REFERENCE {
+		return fmt.Errorf("unsupported retrun value: reason=dest is not REFERENCE: dest=%v", dest)
+	}
+	// PCの書き換え
+	r.setPC(dest.data)
+	return nil
+}
+
 func (r *Runtime) doAdd(dest, src *Object) error {
 	if dest.kind != OBJ_REGISTER {
 		return fmt.Errorf("unsupported add value: reason=dest is not REGISTER: dest=%v", dest)
@@ -287,6 +316,16 @@ programLoop:
 			}
 		case curtOp.kind == OP_POP:
 			if err := r.doPop(curtOp.param1); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_CALL:
+			if err := r.doCall(curtOp.param1); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_RETURN:
+			if err := r.doReturn(); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}

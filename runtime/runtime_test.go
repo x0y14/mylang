@@ -143,6 +143,43 @@ func TestRuntime_Run_Pop(t *testing.T) {
 	assert.Equal(t, NewObject(5), runtime.register[REG_GENERAL_2])
 }
 
+func TestRuntime_Run_Call(t *testing.T) {
+	runtime := NewRuntime(3, 2)
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},                                 // [0] l_0
+		&Operation{kind: OP_CALL, param1: NewLabelObject(9)},                                      // [1] call l_9
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_2), param2: NewObject(5)}, // [2] move g1 5 // skipされるはず
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(9)},                                 // [3] l_9
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},                        // [4] g1 = *l_9
+		&Operation{kind: OP_EXIT},
+	})
+	err := runtime.CollectLabel()
+	assert.Nil(t, err)
+	err = runtime.Run()
+	assert.Nil(t, err)
+	assert.Nil(t, runtime.register[REG_GENERAL_2]) // skipされているからMOVEでの移動はないことを確認
+	assert.Equal(t, NewReferenceObject(2), runtime.register[REG_GENERAL_1])
+}
+
+func TestRuntime_Run_Return(t *testing.T) {
+	runtime := NewRuntime(3, 2)
+	_ = runtime.Load(Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(1)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(5)},
+		&Operation{kind: OP_RETURN},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main(l_0):
+		&Operation{kind: OP_CALL, param1: NewLabelObject(1)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_2), param2: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_EXIT},
+	})
+	err := runtime.CollectLabel()
+	assert.Nil(t, err)
+	err = runtime.Run()
+	assert.Nil(t, err)
+	assert.Equal(t, NewObject(5), runtime.register[REG_GENERAL_1])
+	assert.Equal(t, NewObject(5), runtime.register[REG_GENERAL_2])
+}
+
 func TestRuntime_Run_Add(t *testing.T) {
 	runtime := NewRuntime(3, 3)
 	_ = runtime.Load(Program{
