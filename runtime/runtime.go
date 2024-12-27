@@ -274,6 +274,13 @@ func (r *Runtime) doLe(obj1, obj2 *Object) error {
 }
 
 func (r *Runtime) Load(program Program) error {
+	// main(l_0)を叩くコード, exit
+	startup := Program{
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(-1)}, // process root label
+		&Operation{kind: OP_CALL, param1: NewLabelObject(0)},       // call main
+		&Operation{kind: OP_EXIT},
+	}
+	program = append(startup, program...)
 	r.setProgram(program)
 	return nil
 }
@@ -293,7 +300,7 @@ func (r *Runtime) CollectLabel() error {
 }
 
 func (r *Runtime) Run() error {
-	entryPointAddressObj, err := r.memory.Get("l_0")
+	entryPointAddressObj, err := r.memory.Get("l_-1")
 	if err != nil {
 		return err
 	}
