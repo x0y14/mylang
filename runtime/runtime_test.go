@@ -449,3 +449,190 @@ func TestRuntime_Run_SyscallWrite(t *testing.T) {
 	err = runtime.Run()
 	assert.Equal(t, nil, err)
 }
+
+func TestRuntime_Run_FizzBuzz(t *testing.T) {
+	runtime := NewRuntime(100, 100)
+	_ = runtime.Load(Program{
+		// check_x15(l_1):
+		//   push g1 // fizzbuzzのメインの数字であるg1の保存
+		// loop_c15(l_2):
+		//   sub g1 15
+		// 	 eq g1 0
+		//   jt return_from_x15(l_3)
+		//   lt g1 0 // g1 < 0の場合，x15でないことが確定なので, 終わる
+		//   jt return_from_x15(l_3)
+		//   jump loop_c15(l_2) // もう一回引き算して確認する
+		// return_from_x15(l_3):
+		//   eq g1 0
+		//   pop g1 // g1の復元
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(1)},
+		&Operation{kind: OP_PUSH, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(2)},
+		&Operation{kind: OP_SUB, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(15)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(3)},
+		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(3)},
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(2)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(3)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_RETURN},
+
+		// check_x5(l_4):
+		//   push g1 // fizzbuzzのメインの数字であるg1の保存
+		// loop_c5(l_5):
+		//   sub g1 5
+		// 	 eq g1 0
+		//   jt return_from_x5(l_6)
+		//   lt g1 0 // g1 < 0の場合，x5でないことが確定なので, 終わる
+		//   jt return_from_x5(l_6)
+		//   jump loop_c5(l_5) // もう一回引き算して確認する
+		// return_from_x5(l_6):
+		//   eq g1 0
+		//   pop g1 // g1の復元
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(4)},
+		&Operation{kind: OP_PUSH, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(5)},
+		&Operation{kind: OP_SUB, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(5)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(6)},
+		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(6)},
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(5)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(6)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_RETURN},
+
+		// check_x3(l_7):
+		//   push g1 // fizzbuzzのメインの数字であるg1の保存
+		// loop_c3(l_8):
+		//   sub g1 3
+		// 	 eq g1 0
+		//   jt return_from_x3(l_9)
+		//   lt g1 0 // g1 < 0の場合，x3でないことが確定なので, 終わる
+		//   jt return_from_x3(l_9)
+		//   jump loop_c3(l_8) // もう一回引き算して確認する
+		// return_from_x3(l_9):
+		//   eq g1 0
+		//   pop g1 // g1の復元
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(7)},
+		&Operation{kind: OP_PUSH, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(8)},
+		&Operation{kind: OP_SUB, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(3)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(9)},
+		&Operation{kind: OP_LT, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_TRUE, param1: NewLabelObject(9)},
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(8)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(9)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_POP, param1: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_RETURN},
+
+		// print_fizz(l_10):
+		//   syscall_write stdout 'f'
+		//   syscall_write stdout 'i'
+		//   syscall_write stdout 'z'
+		//   syscall_write stdout 'z'
+		//   ret
+		// print_buzz(l_11):
+		//   syscall_write stdout 'b'
+		//   syscall_write stdout 'u'
+		//   syscall_write stdout 'z'
+		//   syscall_write stdout 'z'
+		//   ret
+		// print_fizzbuzz(l_12):
+		//   call print_fizz(l_10)
+		//   call print_buzz(l_11)
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(10)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('f')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('i')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('z')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('z')},
+		&Operation{kind: OP_RETURN},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(11)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('b')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('u')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('z')},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('z')},
+		&Operation{kind: OP_RETURN},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(12)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(10)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(11)},
+		&Operation{kind: OP_RETURN},
+
+		// fizzbuzz(l_13):
+		//   syscall_write g1
+		//   syscall_write stdout ' '
+		//   call check_x15(l_1)
+		//   jf its_is_not_x15(l_14)
+		//   call print_fizzbuzz(l_12)
+		//   jump its_it_not_x3(l_16) // 重複するので終わる
+		// its_is_not_x15(l_14):
+		//   call check_x5(l_4)
+		// 	 jf its_is_not_x5(l_15)
+		// 	 call print_buzz(l_11)
+		//   jump its_it_not_x3(l_16) // 重複するので終わる
+		// its_is_not_x5(l_15):
+		//   call check_x3(l_7)
+		//   jf its_it_not_x3(l_16)
+		//   call print_fizz(l_10)
+		// its_it_not_x3(l_16):
+		//   syscall_write stdout '\n'
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(13)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewRegisterObject(REG_GENERAL_1)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject(' ')},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(1)},
+		&Operation{kind: OP_JUMP_FALSE, param1: NewLabelObject(14)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(12)},
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(16)},
+		//
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(14)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(4)},
+		&Operation{kind: OP_JUMP_FALSE, param1: NewLabelObject(15)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(11)},
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(16)},
+		//
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(15)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(7)},
+		&Operation{kind: OP_JUMP_FALSE, param1: NewLabelObject(16)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(10)},
+		//
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(16)},
+		&Operation{kind: OP_SYSCALL_WRITE, param1: NewObject(STD_OUT), param2: NewObject('\n')},
+		&Operation{kind: OP_RETURN},
+
+		// main(l_0):
+		//   mov g1 1
+		//   call loop(l_17)
+		//   ret
+		// loop(l_17):
+		//   call fizzbuzz(l_13)
+		//   add g1 1
+		//   eq g1 101
+		//   jf loop(l_17)
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(1)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(17)},
+		&Operation{kind: OP_RETURN},
+		//
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(17)},
+		&Operation{kind: OP_CALL, param1: NewLabelObject(13)},
+		&Operation{kind: OP_ADD, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(1)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(101)},
+		&Operation{kind: OP_JUMP_FALSE, param1: NewLabelObject(17)},
+		&Operation{kind: OP_RETURN},
+	})
+	err := runtime.CollectLabel()
+	assert.Nil(t, err)
+	err = runtime.Run()
+	assert.Nil(t, err)
+}
