@@ -166,6 +166,24 @@ func (r *Runtime) doJumpTrue(dest *Object) error {
 	return nil
 }
 
+func (r *Runtime) doJumpFalse(dest *Object) error {
+	if dest.kind != OBJ_LABEL {
+		return fmt.Errorf("unsupported jump_false value: reason=dest is not label: dest=%v", dest)
+	}
+	if r.register[REG_BOOL_FLAG].IsSame(NewObject(true)) {
+		return nil
+	} else if r.register[REG_BOOL_FLAG].IsSame(NewObject(false)) {
+		destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+		if err != nil {
+			return err
+		}
+		r.setPC(destAddressObj.data)
+	} else {
+		return fmt.Errorf("unsupported jump_false value: reason=bool_flag has not bool: %v", r.register[REG_BOOL_FLAG].String())
+	}
+	return nil
+}
+
 func (r *Runtime) doEq(obj1, obj2 *Object) error {
 	switch {
 	case obj1.kind == OBJ_REGISTER && obj2.kind == OBJ_REGISTER:
@@ -394,6 +412,11 @@ programLoop:
 			}
 		case curtOp.kind == OP_JUMP_TRUE: // JUMP_TRUE $LABEL_NO
 			if err := r.doJumpTrue(curtOp.param1); err != nil {
+				r.setStatus(STAT_ERR)
+				return err
+			}
+		case curtOp.kind == OP_JUMP_FALSE: // JUMP_TRUE $LABEL_NO
+			if err := r.doJumpFalse(curtOp.param1); err != nil {
 				r.setStatus(STAT_ERR)
 				return err
 			}

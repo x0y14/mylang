@@ -392,6 +392,36 @@ func TestRuntime_Run_JumpTrue(t *testing.T) {
 	assert.Equal(t, NewObject(5), runtime.register[REG_GENERAL_1])
 }
 
+func TestRuntime_Run_JumpFalse(t *testing.T) {
+	runtime := NewRuntime(1, 3)
+	_ = runtime.Load(Program{
+		// main:
+		//   move g1 1
+		//   eq g1 0
+		//   jf l_1
+		//   move g2 100
+		//   jump l_2
+		// l_1:
+		//   move g2 1
+		// l_2:
+		//   ret
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(1)},
+		&Operation{kind: OP_EQ, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(0)},
+		&Operation{kind: OP_JUMP_FALSE, param1: NewLabelObject(1)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_2), param2: NewObject(100)},
+		&Operation{kind: OP_JUMP, param1: NewLabelObject(2)},
+		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(1)},
+		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_2), param2: NewObject(1)},
+		&Operation{kind: OP_RETURN},
+	})
+	err := runtime.CollectLabel()
+	assert.Equal(t, nil, err)
+	err = runtime.Run()
+	assert.Equal(t, nil, err)
+	assert.Equal(t, NewObject(1), runtime.register[REG_GENERAL_2])
+}
+
 func TestRuntime_Run_SyscallWrite(t *testing.T) {
 	runtime := NewRuntime(1, 2)
 	_ = runtime.Load(Program{
