@@ -22,7 +22,7 @@ func (s *Stack) Push(obj *Object) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("failed to push to stack: reason=unknown")
+	return fmt.Errorf("failed to push to stack: reason=no space in stack: size=%v", len(s.objects))
 }
 func (s *Stack) Pop() (*Object, error) {
 	if len(s.objects) == 0 {
