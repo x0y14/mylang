@@ -80,3 +80,7 @@ func NewReturnOp() *Operation {
 func NewMoveOp(dest RegisterKind, src *Object) *Operation {
 	return &Operation{kind: OP_MOVE, param1: NewRegisterObject(dest), param2: src}
 }
+
+func NewDefLabelOp(label *Object) *Operation {
+	return &Operation{kind: OP_DEF_LABEL, param1: label}
+}
