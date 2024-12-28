@@ -44,7 +44,47 @@ func (r *Runtime) advance() {
 }
 
 func (r *Runtime) doMove(dest, src *Object) error {
-	if dest.kind != OBJ_REGISTER && dest.kind != OBJ_REFERENCE {
+	switch dest.kind {
+	case OBJ_REGISTER: // 代入先がレジスタ
+		switch src.kind {
+		case OBJ_REGISTER: // ソースがレジスタ
+			r.register[RegisterKind(dest.data)] = r.register[RegisterKind(src.data)].Clone()
+			return nil
+		case OBJ_REFERENCE: // ソースがメモリ
+			if yes := r.memory.IsEmptyAt(src.data); yes { // ソースメモリが空
+				return fmt.Errorf("failed to move value: reason=src memory is empty: %v", src)
+			}
+			r.register[RegisterKind(dest.data)] = r.memory.GetAt(src.data).Clone()
+			return nil
+		default:
+			r.register[RegisterKind(dest.data)] = src.Clone()
+			return nil
+		}
+	case OBJ_REFERENCE: // 代入先がメモリ
+		if yes := r.memory.IsEmptyAt(dest.data); !yes { // 宛先メモリにデータが入っている
+			return fmt.Errorf("failed to move value: reason=dest memory is not empty: %v", dest)
+		}
+		switch src.kind {
+		case OBJ_REGISTER: // ソースがレジスタ
+			if err := r.memory.SetAt(dest.data, r.register[RegisterKind(src.data)].Clone()); err != nil {
+				return err
+			}
+			return nil
+		case OBJ_REFERENCE: // ソースがメモリ
+			if yes := r.memory.IsEmptyAt(src.data); yes { // ソースメモリが空
+				return fmt.Errorf("failed to move value: reason=src memory is empty: %v", src)
+			}
+			if err := r.memory.SetAt(dest.data, r.memory.GetAt(src.data).Clone()); err != nil {
+				return err
+			}
+			return nil
+		default:
+			if err := r.memory.SetAt(dest.data, src.Clone()); err != nil {
+				return err
+			}
+			return nil
+		}
+	default:
 		return fmt.Errorf("unsupported move value: reason=dest is nor REGISTER, REFERENCE: dest=%v", dest)
 	}
 	switch src.kind {
