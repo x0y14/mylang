@@ -97,7 +97,7 @@ func genFunctionArguments(nd *Node, fnNameLabel int) runtime.Program {
 	}
 	// 逆にする
 	slices.Reverse(args)
-	for _, _ = range args {
+	for range args {
 		prog = append(prog, runtime.Program{
 			runtime.NewPopOp(runtime.NewRegisterObject(runtime.REG_TEMP_1)),
 			runtime.NewMoveOp(runtime.NewReferenceObject(fnNameLabel+count), runtime.NewRegisterObject(runtime.REG_TEMP_1)),
