@@ -7,18 +7,20 @@ import (
 )
 
 type Runtime struct {
-	stack    *Stack
-	memory   *Memory
-	program  Program
-	register Register
+	stack       *Stack
+	memory      *Memory
+	program     Program
+	register    Register
+	symbolTable *SymbolTable
 }
 
 func NewRuntime(stackSize int, memorySize int) *Runtime {
 	return &Runtime{
-		stack:    NewStack(stackSize),
-		memory:   NewMemory(memorySize),
-		program:  nil,
-		register: NewRegister(),
+		stack:       NewStack(stackSize),
+		memory:      NewMemory(memorySize),
+		program:     nil,
+		register:    NewRegister(),
+		symbolTable: NewSymbolTable(),
 	}
 }
 
@@ -88,12 +90,12 @@ func (r *Runtime) doCall(dest *Object) error {
 		return err
 	}
 	// ラベル経由で宛先の取り出し
-	destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+	destAddress, err := r.symbolTable.Get("l_" + strconv.Itoa(dest.data))
 	if err != nil {
 		return err
 	}
 	// PCの書き換え
-	r.setPC(destAddressObj.data)
+	r.setPC(destAddress)
 	return nil
 }
 func (r *Runtime) doReturn() error {
@@ -139,11 +141,11 @@ func (r *Runtime) doJump(dest *Object) error {
 	if dest.kind != OBJ_LABEL {
 		return fmt.Errorf("unsupported jump value: reason=dest is not label: dest=%v", dest)
 	}
-	destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+	destAddress, err := r.symbolTable.Get("l_" + strconv.Itoa(dest.data))
 	if err != nil {
 		return err
 	}
-	r.setPC(destAddressObj.data)
+	r.setPC(destAddress)
 	return nil
 }
 
@@ -154,11 +156,11 @@ func (r *Runtime) doJumpTrue(dest *Object) error {
 	if r.register[REG_BOOL_FLAG].IsSame(NewObject(false)) {
 		return nil
 	} else if r.register[REG_BOOL_FLAG].IsSame(NewObject(true)) {
-		destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+		destAddress, err := r.symbolTable.Get("l_" + strconv.Itoa(dest.data))
 		if err != nil {
 			return err
 		}
-		r.setPC(destAddressObj.data)
+		r.setPC(destAddress)
 	} else {
 		return fmt.Errorf("unsupported jump_true value: reason=bool_flag has not bool: %v", r.register[REG_BOOL_FLAG].String())
 	}
@@ -173,11 +175,11 @@ func (r *Runtime) doJumpFalse(dest *Object) error {
 	if r.register[REG_BOOL_FLAG].IsSame(NewObject(true)) {
 		return nil
 	} else if r.register[REG_BOOL_FLAG].IsSame(NewObject(false)) {
-		destAddressObj, err := r.memory.Get("l_" + strconv.Itoa(dest.data))
+		destAddress, err := r.symbolTable.Get("l_" + strconv.Itoa(dest.data))
 		if err != nil {
 			return err
 		}
-		r.setPC(destAddressObj.data)
+		r.setPC(destAddress)
 	} else {
 		return fmt.Errorf("unsupported jump_false value: reason=bool_flag has not bool: %v", r.register[REG_BOOL_FLAG].String())
 	}
@@ -329,7 +331,7 @@ func (r *Runtime) CollectLabel() error {
 			if op.param1.kind != OBJ_LABEL {
 				return fmt.Errorf("failed to collect label: failed to define label: reason=this is not label object: obj=%s", op.param1.String())
 			}
-			if err := r.memory.Set("l_"+strconv.Itoa(op.param1.data), NewReferenceObject(pc)); err != nil {
+			if err := r.symbolTable.Set("l_"+strconv.Itoa(op.param1.data), pc); err != nil {
 				return err
 			}
 		}
@@ -338,11 +340,11 @@ func (r *Runtime) CollectLabel() error {
 }
 
 func (r *Runtime) Run() error {
-	entryPointAddressObj, err := r.memory.Get("l_-1")
+	entryPointAddress, err := r.symbolTable.Get("l_-1")
 	if err != nil {
 		return err
 	}
-	r.setPC(entryPointAddressObj.data)
+	r.setPC(entryPointAddress)
 	r.setStatus(STAT_SUCCESS)
 programLoop:
 	for {
