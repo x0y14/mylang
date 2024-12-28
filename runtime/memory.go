@@ -2,26 +2,26 @@ package runtime
 
 import "fmt"
 
-func NewMemoryV2(size int) *MemoryV2 {
-	mem := make(MemoryV2, size)
+func NewMemory(size int) *Memory {
+	mem := make(Memory, size)
 	return &mem
 }
 
-type MemoryV2 []*Object
+type Memory []*Object
 
-func (m2 *MemoryV2) SetAt(addr int, obj *Object) error {
-	if 0 <= addr && addr < len(*m2) {
-		(*m2)[addr] = obj
+func (m *Memory) SetAt(addr int, obj *Object) error {
+	if 0 <= addr && addr < len(*m) {
+		(*m)[addr] = obj
 		return nil
 	}
-	return fmt.Errorf("addr must be 0 <= $addr < %d", len(*m2))
+	return fmt.Errorf("addr must be 0 <= $addr < %d", len(*m))
 }
-func (m2 *MemoryV2) GetAt(addr int) *Object {
-	return (*m2)[addr]
+func (m *Memory) GetAt(addr int) *Object {
+	return (*m)[addr]
 }
-func (m2 *MemoryV2) DeleteAt(addr int) {
-	(*m2)[addr] = nil
+func (m *Memory) DeleteAt(addr int) {
+	(*m)[addr] = nil
 }
-func (m2 *MemoryV2) IsEmptyAt(addr int) bool {
-	return (*m2)[addr] == nil
+func (m *Memory) IsEmptyAt(addr int) bool {
+	return (*m)[addr] == nil
 }

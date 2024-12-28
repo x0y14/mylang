@@ -8,7 +8,7 @@ import (
 
 type Runtime struct {
 	stack       *Stack
-	memory      *MemoryV2
+	memory      *Memory
 	program     Program
 	register    Register
 	symbolTable *SymbolTable
@@ -17,7 +17,7 @@ type Runtime struct {
 func NewRuntime(stackSize int, memorySize int) *Runtime {
 	return &Runtime{
 		stack:       NewStack(stackSize),
-		memory:      NewMemoryV2(memorySize),
+		memory:      NewMemory(memorySize),
 		program:     nil,
 		register:    NewRegister(),
 		symbolTable: NewSymbolTable(),
