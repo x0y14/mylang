@@ -91,3 +91,14 @@ func NewPushOp(src *Object) *Operation {
 func NewPopOp(dest *Object) *Operation {
 	return &Operation{kind: OP_POP, param1: dest}
 }
+
+func NewAddOp(dest, src *Object) *Operation {
+	return &Operation{kind: OP_ADD, param1: dest, param2: src}
+}
+func NewSubOp(dest, src *Object) *Operation {
+	return &Operation{kind: OP_SUB, param1: dest, param2: src}
+}
+
+func NewCallOp(label *Object) *Operation {
+	return &Operation{kind: OP_CALL, param1: label}
+}
