@@ -34,8 +34,8 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, STAT_ERR, Status(runtime.register[REG_STATUS].data))
 	assert.Equal(t, nil, err)
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_STATUS), param2: NewObject(999)},
@@ -47,8 +47,8 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, 999, runtime.register[REG_STATUS].data)
 	assert.Equal(t, nil, err)
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewRegisterObject(REG_GENERAL_1), param2: NewObject(888)},
@@ -61,8 +61,8 @@ func TestRuntime_Run_Move(t *testing.T) {
 	assert.Equal(t, 888, runtime.register[REG_STATUS].data)
 	assert.Equal(t, nil, err)
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
 		&Operation{kind: OP_MOVE, param1: NewObject(1), param2: NewObject(1)},
@@ -94,7 +94,7 @@ func TestRuntime_Run_Push(t *testing.T) {
 	assert.Equal(t, NewReferenceObject(2), runtime.stack.objects[0])
 }
 func TestRuntime_Run_Pop(t *testing.T) {
-	runtime := NewRuntime(4, 2)
+	runtime := NewRuntime(4, 3)
 	// 単純なpush, pop
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
@@ -108,8 +108,8 @@ func TestRuntime_Run_Pop(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, NewObject(1), runtime.register[REG_GENERAL_1])
 	// remove main
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	// popで上書き
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
@@ -127,8 +127,8 @@ func TestRuntime_Run_Pop(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, NewObject(3), runtime.register[REG_GENERAL_1])
 	// remove main
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	// G2に足してく
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)},
@@ -253,8 +253,8 @@ func TestRuntime_Run_Eq(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main:
 		&Operation{kind: OP_EQ, param1: NewObject(99), param2: NewObject(100)},
@@ -280,8 +280,8 @@ func TestRuntime_Run_Ne(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main:
 		&Operation{kind: OP_NE, param1: NewObject(99), param2: NewObject(100)},
@@ -307,8 +307,8 @@ func TestRuntime_Run_Lt(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main:
 		&Operation{kind: OP_LT, param1: NewObject(100), param2: NewObject(99)},
@@ -320,8 +320,8 @@ func TestRuntime_Run_Lt(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main:
 		&Operation{kind: OP_LT, param1: NewObject(99), param2: NewObject(100)},
@@ -347,8 +347,8 @@ func TestRuntime_Run_Le(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(true), runtime.register[REG_BOOL_FLAG])
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main:
 		&Operation{kind: OP_LE, param1: NewObject(100), param2: NewObject(99)},
@@ -360,8 +360,8 @@ func TestRuntime_Run_Le(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, NewObject(false), runtime.register[REG_BOOL_FLAG])
 
-	_ = runtime.memory.Delete("l_0")
-	_ = runtime.memory.Delete("l_-1")
+	runtime.symbolTable.Delete("l_0")
+	runtime.symbolTable.Delete("l_-1")
 	_ = runtime.Load(Program{
 		&Operation{kind: OP_DEF_LABEL, param1: NewLabelObject(0)}, // main:
 		&Operation{kind: OP_LE, param1: NewObject(99), param2: NewObject(100)},
