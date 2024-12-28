@@ -77,10 +77,17 @@ func NewReturnOp() *Operation {
 	return &Operation{kind: OP_RETURN}
 }
 
-func NewMoveOp(dest RegisterKind, src *Object) *Operation {
-	return &Operation{kind: OP_MOVE, param1: NewRegisterObject(dest), param2: src}
+func NewMoveOp(dest, src *Object) *Operation {
+	return &Operation{kind: OP_MOVE, param1: dest, param2: src}
 }
 
 func NewDefLabelOp(label *Object) *Operation {
 	return &Operation{kind: OP_DEF_LABEL, param1: label}
+}
+
+func NewPushOp(src *Object) *Operation {
+	return &Operation{kind: OP_PUSH, param1: src}
+}
+func NewPopOp(dest *Object) *Operation {
+	return &Operation{kind: OP_POP, param1: dest}
 }

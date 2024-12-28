@@ -107,3 +107,10 @@ func (t *Token) GetString() (string, error) {
 	}
 	return t.text, nil
 }
+
+func (t *Token) GetIdent() (string, error) {
+	if t.kind != TK_IDENT {
+		return "", fmt.Errorf("this token is not ident: %v", t.kind.String())
+	}
+	return t.text, nil
+}
