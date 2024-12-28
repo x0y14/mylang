@@ -72,3 +72,11 @@ func (op *Operation) String() string {
 	}
 	return str
 }
+
+func NewReturnOp() *Operation {
+	return &Operation{kind: OP_RETURN}
+}
+
+func NewMoveOp(dest RegisterKind, src *Object) *Operation {
+	return &Operation{kind: OP_MOVE, param1: NewRegisterObject(dest), param2: src}
+}
