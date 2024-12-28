@@ -44,12 +44,19 @@ func (r *Runtime) advance() {
 }
 
 func (r *Runtime) doMove(dest, src *Object) error {
-	if dest.kind != OBJ_REGISTER {
-		return fmt.Errorf("unsupported move value: reason=dest is not REGISTER: dest=%v", dest)
+	if dest.kind != OBJ_REGISTER && dest.kind != OBJ_REFERENCE {
+		return fmt.Errorf("unsupported move value: reason=dest is nor REGISTER, REFERENCE: dest=%v", dest)
 	}
 	switch src.kind {
 	case OBJ_REGISTER:
 		r.register[RegisterKind(dest.data)] = r.register[RegisterKind(src.data)].Clone()
+		return nil
+	case OBJ_REFERENCE:
+		if !r.memory.IsEmptyAt(dest.data) {
+			return fmt.Errorf("failed to move value: reason=dest memory is not empty: %v", dest)
+		}
+		err := r.memory.SetAt(dest.data, src.Clone())
+		return err
 	default:
 		r.register[RegisterKind(dest.data)] = src.Clone()
 	}
